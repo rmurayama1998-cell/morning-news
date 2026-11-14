@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>朝のニュース</title>
+<meta name="description" content="教育・経済・政治のニュースを、要約とAIの2つの意見つきで毎朝お届けします。">
+<meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16181c" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📰</text></svg>">
+<style>
+  :root {
+    --bg: #f6f4ef;
+    --card: #ffffff;
+    --ink: #1d1f23;
+    --sub: #5f6368;
+    --line: #e4e0d8;
+    --edu: #2f7d5b;
+    --eco: #b26a12;
+    --pol: #3d5fa8;
+    --v1-bg: #eef5f1;
+    --v1-ink: #23664a;
+    --v2-bg: #fbf1e6;
+    --v2-ink: #8f520b;
+    --chip: #ebe7df;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16181c;
+      --card: #1f2227;
+      --ink: #eceae5;
+      --sub: #a3a7ad;
+      --line: #30343a;
+      --edu: #5fbf92;
+      --eco: #e3a252;
+      --pol: #8aa8ea;
+      --v1-bg: #1c2b25;
+      --v1-ink: #8fd6b3;
+      --v2-bg: #2e241a;
+      --v2-ink: #f0bd7d;
+      --chip: #2a2e34;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+      "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif;
+    font-size: 17px;
+    line-height: 1.75;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+
+  header.top { padding: 28px 0 8px; }
+  .date-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .date { font-size: 15px; color: var(--sub); letter-spacing: .02em; }
+  h1 { margin: 2px 0 0; font-size: 30px; line-height: 1.3; letter-spacing: .02em; }
+  .nav { display: flex; gap: 6px; }
+  .nav button {
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    border-radius: 999px; font: inherit; font-size: 14px; padding: 6px 12px; cursor: pointer;
+  }
+  .nav button:disabled { opacity: .35; cursor: default; }
+
+  nav.tabs {
+    position: sticky; top: 0; z-index: 5;
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.tabs .wrap { display: flex; gap: 8px; padding-top: 10px; padding-bottom: 10px; overflow-x: auto; }
+  nav.tabs a {
+    flex: none; text-decoration: none; color: var(--ink); background: var(--chip);
+    border-radius: 999px; padding: 4px 14px; font-size: 15px; font-weight: 600;
+  }
+  nav.tabs a .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+  section.cat { padding-top: 26px; }
+  section.cat > h2 {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 12px; font-size: 21px;
+  }
+  section.cat > h2::before { content: ""; width: 6px; height: 22px; border-radius: 3px; background: var(--c); }
+  .edu { --c: var(--edu); } .eco { --c: var(--eco); } .pol { --c: var(--pol); }
+
+  article {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 18px 16px; margin-bottom: 14px;
+  }
+  article h3 { margin: 0; font-size: 20px; line-height: 1.5; }
+  .meta { margin-top: 4px; font-size: 13.5px; color: var(--sub); display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
+  .meta a { color: var(--c); font-weight: 600; text-decoration: none; }
+  .meta a:hover { text-decoration: underline; }
+  .summary { margin-top: 10px; }
+  .summary p { margin: 0 0 .8em; text-indent: 1em; }
+  .summary p:last-child { margin-bottom: 0; }
+  .views-head { margin: 16px 0 8px; font-size: 13px; font-weight: 700; color: var(--sub); letter-spacing: .06em; }
+  .views { display: grid; gap: 10px; }
+  @media (min-width: 680px) { .views { grid-template-columns: 1fr 1fr; } }
+  .view { border-radius: 12px; padding: 12px 14px; font-size: 16px; line-height: 1.75; }
+  .view b { display: block; font-size: 14px; margin-bottom: 2px; }
+  .view.v1 { background: var(--v1-bg); } .view.v1 b { color: var(--v1-ink); }
+  .view.v2 { background: var(--v2-bg); } .view.v2 b { color: var(--v2-ink); }
+  .empty { color: var(--sub); font-size: 15px; padding: 4px 0 8px; }
+
+  footer { color: var(--sub); font-size: 13px; padding: 28px 0 48px; line-height: 1.7; }
+  .notice { background: var(--chip); border-radius: 12px; padding: 12px 14px; margin-top: 18px; font-size: 14px; color: var(--sub); }
+  .loading { padding: 60px 0; text-align: center; color: var(--sub); }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="date-row">
+      <div class="date" id="date">&nbsp;</div>
+      <div class="nav">
+        <button id="prev" type="button" aria-label="前の日">‹ 前の日</button>
+        <button id="next" type="button" aria-label="次の日">次の日 ›</button>
+      </div>
+    </div>
+    <h1>朝のニュース</h1>
+  </div>
+</header>
+<nav class="tabs" id="tabs" hidden><div class="wrap"></div></nav>
+<main class="wrap" id="main"><div class="loading">読み込み中…</div></main>
+<footer class="wrap">
+  要約と「2つの見方」は、各社が公開している記事の本文・要約文をもとにAI(Gemini)が書いたものです。大事な判断の前には元の記事も確かめてください。<br>
+  出典：NHK、産経新聞、TBS NEWS DIG、リセマム（各社の公開RSS）
+</footer>
+
+<script>
+(() => {
+  const CLASS = { education: "edu", economy: "eco", politics: "pol" };
+  const WD = "日月火水木金土";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const bust = () => "?v=" + Date.now();
+  let dates = [];
+
+  async function getJSON(path) {
+    const r = await fetch(path + bust(), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  }
+
+  function fmtDate(iso) {
+    const [y, m, d] = iso.split("-").map(Number);
+    const wd = WD[new Date(y, m - 1, d).getDay()];
+    return `${y}年${m}月${d}日(${wd})`;
+  }
+
+  function card(item) {
+    const views = (item.views || []).length === 2
+      ? `<div class="views-head">AIが考えた 2つの見方</div>
+         <div class="views">
+           ${item.views.map((v, i) => `<div class="view v${i + 1}"><b>${esc(v.label)}</b>${esc(v.text)}</div>`).join("")}
+         </div>`
+      : "";
+    return `<article>
+      <h3>${esc(item.title)}</h3>
+      <div class="meta">
+        ${item.source ? `<span>${esc(item.source)}</span>` : ""}
+        <a href="${esc(item.link)}" target="_blank" rel="noopener">元の記事を読む ↗</a>
+      </div>
+      ${item.summary ? `<div class="summary">${item.summary.split(/\n+/).filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join("")}</div>` : ""}
+      ${views}
+    </article>`;
+  }
+
+  function render(d) {
+    $("date").textContent = fmtDate(d.date);
+    document.title = `朝のニュース ${d.date.slice(5).replace("-", "/")}`;
+    const cats = d.categories || [];
+    const tabs = $("tabs");
+    tabs.querySelector(".wrap").innerHTML = cats.map((c) =>
+      `<a href="#${c.key}" class="${CLASS[c.key] || ""}"><span class="dot" style="background:var(--c)"></span>${esc(c.label)} ${c.items.length}</a>`
+    ).join("");
+    tabs.hidden = false;
+    $("main").innerHTML = cats.map((c) => `
+      <section class="cat ${CLASS[c.key] || ""}" id="${c.key}">
+        <h2>${esc(c.label)}</h2>
+        ${c.items.length ? c.items.map(card).join("") : `<div class="empty">この日は取得できませんでした。</div>`}
+      </section>`).join("")
+      + (d.ai ? "" : `<div class="notice">この日はAIの要約が作れなかったため、見出しだけを載せています。</div>`);
+    const i = dates.indexOf(d.date);
+    $("prev").disabled = i === -1 || i >= dates.length - 1;
+    $("next").disabled = i <= 0;
+    $("prev").onclick = () => go(dates[i + 1]);
+    $("next").onclick = () => go(dates[i - 1]);
+  }
+
+  async function go(date, push = true) {
+    $("main").innerHTML = `<div class="loading">読み込み中…</div>`;
+    try {
+      const d = await getJSON(date ? `data/${date}.json` : "data/latest.json");
+      render(d);
+      if (push) history.pushState({ d: d.date }, "", `?d=${d.date}`);
+      window.scrollTo(0, 0);
+    } catch (e) {
+      if (date) return go(null, push);  // an old link whose day was pruned
+      $("main").innerHTML = `<div class="loading">ニュースを読み込めませんでした。少し待ってから開き直してください。</div>`;
+    }
+  }
+
+  window.addEventListener("popstate", (e) => go(e.state?.d || null, false));
+
+  (async () => {
+    try { dates = (await getJSON("data/index.json")).dates || []; } catch { dates = []; }
+    const want = new URLSearchParams(location.search).get("d");
+    go(want && /^\d{4}-\d{2}-\d{2}$/.test(want) ? want : null, false);
+  })();
+})();
+</script>
+</body>
+</html>
